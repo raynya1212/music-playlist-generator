@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       The playlist MUST include a diverse and balanced mix of:
       - Current Billboard Hot 100 chart-topping hits.
       - Top hits from Spotify's global streaming rankings.
-      - Inspiring but slightly minor/lesser-known niche tracks.
+      - Inspiring but slightly minor/lesser-known niche tracks (focusing primarily on new releases).
       
       Output ONLY a valid JSON object with the following structure. Do not wrap in markdown blocks, just raw JSON:
       {

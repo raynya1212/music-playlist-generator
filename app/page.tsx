@@ -43,16 +43,10 @@ export default function Home() {
       <div className="shape-ring"></div>
 
       <main className="container">
-        {/* Left Panel - Player / Generator */}
+        {/* Left Panel - Generator */}
         <div className="glass-panel player-panel">
           <div className="panel-header">
-            <button className="icon-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
             <span className="header-title">Generate mix</span>
-            <button className="icon-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-            </button>
           </div>
 
           <div className="album-art-container">
@@ -64,19 +58,7 @@ export default function Home() {
             <p className="track-artist">Curated just for you</p>
           </div>
 
-          <div className="progress-bar-container">
-            <span>0:00</span>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: loading ? '100%' : '30%', transition: loading ? 'width 10s ease-out' : 'width 0.3s ease' }}></div>
-            </div>
-            <span>60:00</span>
-          </div>
-
           <div className="controls">
-            <button className="ctrl-btn" disabled={loading}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
-            </button>
-            
             <button 
               className={`play-btn ${loading ? 'loading' : ''}`}
               onClick={handleGenerate}
@@ -89,31 +71,24 @@ export default function Home() {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               )}
             </button>
-
-            <button className="ctrl-btn" disabled={loading}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            </button>
           </div>
+
+          <p className="generate-hint">
+            {loading ? 'Generating your mix...' : 'Tap to generate'}
+          </p>
           
           {error && (
-            <div style={{ marginTop: '1.5rem', color: '#ffb8b8', fontSize: '0.85rem', textAlign: 'center' }}>
+            <div style={{ marginTop: '1rem', color: '#ffb8b8', fontSize: '0.85rem', textAlign: 'center' }}>
               {error}
             </div>
           )}
         </div>
 
-        {/* Right Panel - Result / Recommended */}
+        {/* Right Panel - Result */}
         <div className="glass-panel list-panel">
           <div className="panel-header">
-            <button className="icon-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            </button>
-            <button className="icon-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
-            </button>
+            <span className="header-title">Result</span>
           </div>
-
-          <h3 className="section-title">Result</h3>
           
           {playlist ? (
             <PlaylistCard url={playlist.url} name={playlist.name} trackCount={playlist.count} />

@@ -389,6 +389,14 @@ body {
   border: 1px solid rgba(255,255,255,0.3);
 }
 
+.generate-hint {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
 /* Animations */
 @keyframes spin {
   from { transform: rotate(0deg); }
