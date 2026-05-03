@@ -15,13 +15,22 @@ const GENRES = [
   { id: "country", label: "Country", icon: "🤠" },
   { id: "alternative", label: "Alternative", icon: "⚡" },
   { id: "chill", label: "Chill / Lo-fi", icon: "🌙" },
-  { id: "dance", label: "Dance", icon: "💃" },
   { id: "blues", label: "Blues", icon: "🎵" },
-  { id: "reggae", label: "Reggae", icon: "🌴" },
   { id: "metal", label: "Metal", icon: "🤘" },
   { id: "k-pop", label: "K-Pop", icon: "🇰🇷" },
   { id: "latin", label: "Latin", icon: "🔥" },
   { id: "folk", label: "Folk", icon: "🪕" },
+];
+
+const ERAS = [
+  { id: "any", label: "Any Era" },
+  { id: "2020s", label: "2020s" },
+  { id: "2010s", label: "2010s" },
+  { id: "2000s", label: "2000s" },
+  { id: "90s", label: "'90s" },
+  { id: "80s", label: "'80s" },
+  { id: "70s", label: "'70s" },
+  { id: "60s", label: "'60s" },
 ];
 
 const MOODS = [
@@ -37,17 +46,6 @@ const MOODS = [
   { id: "dark", label: "Dark", icon: "🖤" },
   { id: "uplifting", label: "Uplifting", icon: "🌅" },
   { id: "nostalgic", label: "Nostalgic", icon: "📼" },
-];
-
-const ERAS = [
-  { id: "any", label: "Any Era" },
-  { id: "2020s", label: "2020s" },
-  { id: "2010s", label: "2010s" },
-  { id: "2000s", label: "2000s" },
-  { id: "90s", label: "'90s" },
-  { id: "80s", label: "'80s" },
-  { id: "70s", label: "'70s" },
-  { id: "60s", label: "'60s" },
 ];
 
 const DURATIONS = [
@@ -107,15 +105,15 @@ export default function Home() {
 
   return (
     <>
-      <div className="bg-shape shape-1"></div>
-      <div className="bg-shape shape-2"></div>
-      <div className="shape-ring"></div>
+      {/* Background */}
+      <div className="bg-mesh"></div>
+      <div className="bg-blob-accent"></div>
 
       <main className="container">
         {/* Left Panel - Player Style */}
         <div className="glass-panel player-panel">
           <div className="panel-header">
-            <span className="header-title">Generate mix</span>
+            <span className="header-title">Now Creating</span>
           </div>
 
           <div className="album-art-container">
@@ -139,7 +137,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Duration toggle styled like a progress bar area */}
+          {/* Duration */}
           <div className="duration-bar">
             {DURATIONS.map((d) => (
               <button
@@ -153,7 +151,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Play / Generate button */}
+          {/* Generate button */}
           <div className="controls">
             <button
               className={`play-btn ${loading ? 'loading' : ''}`}
@@ -174,21 +172,22 @@ export default function Home() {
           </p>
 
           {error && (
-            <div className="error-msg">
-              {error}
-            </div>
+            <div className="error-msg">{error}</div>
           )}
         </div>
 
-        {/* Right Panel - Selections & Result */}
+        {/* Right Panel - Settings */}
         <div className="glass-panel list-panel">
           <div className="panel-header">
-            <span className="header-title">Settings</span>
+            <span className="header-title">Customize</span>
           </div>
 
-          {/* Genre */}
+          {/* Step 1: Genre */}
           <div className="section">
-            <h3 className="section-title">Genre</h3>
+            <div className="section-label">
+              <span className="section-number">1</span>
+              <h3 className="section-title">Genre</h3>
+            </div>
             <div className="chip-grid">
               {GENRES.map((g) => (
                 <button
@@ -204,9 +203,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Era */}
+          {/* Step 2: Era */}
           <div className="section">
-            <h3 className="section-title">Era</h3>
+            <div className="section-label">
+              <span className="section-number">2</span>
+              <h3 className="section-title">Era</h3>
+            </div>
             <div className="chip-grid">
               {ERAS.map((e) => (
                 <button
@@ -221,9 +223,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Mood */}
+          {/* Step 3: Mood */}
           <div className="section">
-            <h3 className="section-title">Mood</h3>
+            <div className="section-label">
+              <span className="section-number">3</span>
+              <h3 className="section-title">Mood</h3>
+            </div>
             <div className="chip-grid">
               {MOODS.map((m) => (
                 <button
@@ -242,7 +247,10 @@ export default function Home() {
           {/* Result */}
           {playlist && (
             <div className="section">
-              <h3 className="section-title">Your Playlist</h3>
+              <div className="section-label">
+                <span className="section-number">✓</span>
+                <h3 className="section-title">Your Playlist</h3>
+              </div>
               <PlaylistCard url={playlist.url} name={playlist.name} trackCount={playlist.count} />
               <button className="reset-btn" onClick={handleReset}>
                 Generate Another
