@@ -7,17 +7,33 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: Request) {
   try {
+    const body = await req.json();
+    const { genre, mood, duration } = body;
+
+    if (!genre || !mood || !duration) {
+      return NextResponse.json({ error: "Genre, mood, and duration are required." }, { status: 400 });
+    }
+
+    const trackCount = duration === "30" ? "8-10" : "16-18";
+    const durationLabel = duration === "30" ? "30-minute" : "1-hour";
+
     // 1. Generate Playlist with Gemini
     const prompt = `
-      You are an expert music curator. Create a 1-hour long playlist (approximately 16-18 tracks) of Western music (English).
-      The playlist MUST include a diverse and balanced mix of:
-      - Current Billboard Hot 100 chart-topping hits.
-      - Top hits from Spotify's global streaming rankings.
-      - Inspiring but slightly minor/lesser-known niche tracks (focusing primarily on new releases).
+      You are an expert music curator. Create a ${durationLabel} playlist (approximately ${trackCount} tracks).
+      
+      Genre: ${genre}
+      Mood: ${mood}
+      
+      Requirements:
+      - All tracks must fit the specified genre and mood.
+      - Include a diverse mix of well-known hits and hidden gems within that genre.
+      - Focus primarily on new releases and recent tracks, but include a few timeless favorites if they match the mood.
+      - Avoid repeating the same artists. Maximize variety.
+      - Make the playlist flow naturally — consider energy levels and transitions between tracks.
       
       Output ONLY a valid JSON object with the following structure. Do not wrap in markdown blocks, just raw JSON:
       {
-        "playlistName": "A catchy English name for this playlist",
+        "playlistName": "A catchy English name for this playlist that reflects the genre and mood",
         "tracks": [
           {
             "title": "Song Title",
