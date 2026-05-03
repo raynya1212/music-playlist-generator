@@ -37,47 +37,117 @@ export default function Home() {
   };
 
   return (
-    <main className="container" style={{ alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-      <div className="glass-panel" style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
-        <h1 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '1rem', lineHeight: 1.2 }}>
-          AI Playlist Generator
-        </h1>
-        <p style={{ color: '#475569', fontSize: '1.125rem', marginBottom: '2.5rem' }}>
-          Discover a curated 1-hour mix of Billboard Hot 100 chart-toppers, Spotify global streaming hits, and inspiring lesser-known tracks.
-        </p>
+    <>
+      <div className="bg-shape shape-1"></div>
+      <div className="bg-shape shape-2"></div>
+      <div className="shape-ring"></div>
 
-        <div>
-          <button 
-            onClick={handleGenerate} 
-            disabled={loading}
-            className={`btn-primary ${loading ? 'animate-pulse-slow' : ''}`}
-            style={{ width: '100%', maxWidth: '300px' }}
-          >
-            {loading ? (
-              <>
+      <main className="container">
+        {/* Left Panel - Player / Generator */}
+        <div className="glass-panel player-panel">
+          <div className="panel-header">
+            <button className="icon-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <span className="header-title">Generate mix</span>
+            <button className="icon-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+            </button>
+          </div>
+
+          <div className="album-art-container">
+            <div className="album-art"></div>
+          </div>
+
+          <div className="track-info">
+            <h2 className="track-title">AI Playlist Generator</h2>
+            <p className="track-artist">Curated just for you</p>
+          </div>
+
+          <div className="progress-bar-container">
+            <span>0:00</span>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: loading ? '100%' : '30%', transition: loading ? 'width 10s ease-out' : 'width 0.3s ease' }}></div>
+            </div>
+            <span>60:00</span>
+          </div>
+
+          <div className="controls">
+            <button className="ctrl-btn" disabled={loading}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
+            </button>
+            
+            <button 
+              className={`play-btn ${loading ? 'loading' : ''}`}
+              onClick={handleGenerate}
+              disabled={loading}
+              title="Generate Playlist"
+            >
+              {loading ? (
                 <div className="spinner"></div>
-                Generating Magic...
-              </>
-            ) : (
-              "Generate Playlist"
-            )}
-          </button>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              )}
+            </button>
 
+            <button className="ctrl-btn" disabled={loading}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+            </button>
+          </div>
+          
           {error && (
-            <div style={{ marginTop: '1.5rem', color: '#f87171', background: 'rgba(248, 113, 113, 0.1)', padding: '1rem', borderRadius: '0.5rem', border: '1px solid rgba(248, 113, 113, 0.2)' }}>
+            <div style={{ marginTop: '1.5rem', color: '#ffb8b8', fontSize: '0.85rem', textAlign: 'center' }}>
               {error}
             </div>
           )}
-
-          {playlist && (
-            <PlaylistCard 
-              url={playlist.url} 
-              name={playlist.name} 
-              trackCount={playlist.count} 
-            />
-          )}
         </div>
-      </div>
-    </main>
+
+        {/* Right Panel - Result / Recommended */}
+        <div className="glass-panel list-panel">
+          <div className="panel-header">
+            <button className="icon-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </button>
+            <button className="icon-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
+            </button>
+          </div>
+
+          <h3 className="section-title">Result</h3>
+          
+          {playlist ? (
+            <PlaylistCard url={playlist.url} name={playlist.name} trackCount={playlist.count} />
+          ) : (
+            <div>
+              <div className="list-item" style={{ opacity: 0.5 }}>
+                <div className="list-item-img" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
+                <div className="list-item-info">
+                  <div className="list-item-title" style={{ width: '60%', height: '14px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }}></div>
+                  <div className="list-item-subtitle" style={{ width: '40%', height: '10px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', marginTop: '8px' }}></div>
+                </div>
+              </div>
+              <div className="list-item" style={{ opacity: 0.3 }}>
+                <div className="list-item-img" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
+                <div className="list-item-info">
+                  <div className="list-item-title" style={{ width: '70%', height: '14px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }}></div>
+                  <div className="list-item-subtitle" style={{ width: '50%', height: '10px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', marginTop: '8px' }}></div>
+                </div>
+              </div>
+              <div className="list-item" style={{ opacity: 0.1 }}>
+                <div className="list-item-img" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
+                <div className="list-item-info">
+                  <div className="list-item-title" style={{ width: '50%', height: '14px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px' }}></div>
+                  <div className="list-item-subtitle" style={{ width: '30%', height: '10px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', marginTop: '8px' }}></div>
+                </div>
+              </div>
+              <p style={{ textAlign: 'center', marginTop: '3rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                Click the generate button<br/>to create your mix
+              </p>
+            </div>
+          )}
+
+        </div>
+      </main>
+    </>
   );
 }
