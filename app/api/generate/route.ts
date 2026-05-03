@@ -8,7 +8,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { genre, mood, duration } = body;
+    const { genre, mood, duration, era } = body;
 
     if (!genre || !mood || !duration) {
       return NextResponse.json({ error: "Genre, mood, and duration are required." }, { status: 400 });
@@ -16,6 +16,10 @@ export async function POST(req: Request) {
 
     const trackCount = duration === "30" ? "8-10" : "16-18";
     const durationLabel = duration === "30" ? "30-minute" : "1-hour";
+
+    const eraInstruction = era && era !== "any"
+      ? `- All tracks should be from the ${era} era/decade.`
+      : `- Include tracks from any era, but lean towards newer releases.`;
 
     // 1. Generate Playlist with Gemini
     const prompt = `
@@ -26,8 +30,8 @@ export async function POST(req: Request) {
       
       Requirements:
       - All tracks must fit the specified genre and mood.
+      ${eraInstruction}
       - Include a diverse mix of well-known hits and hidden gems within that genre.
-      - Focus primarily on new releases and recent tracks, but include a few timeless favorites if they match the mood.
       - Avoid repeating the same artists. Maximize variety.
       - Make the playlist flow naturally — consider energy levels and transitions between tracks.
       

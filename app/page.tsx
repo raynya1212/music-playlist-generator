@@ -39,6 +39,17 @@ const MOODS = [
   { id: "nostalgic", label: "Nostalgic", icon: "📼" },
 ];
 
+const ERAS = [
+  { id: "any", label: "Any Era" },
+  { id: "2020s", label: "2020s" },
+  { id: "2010s", label: "2010s" },
+  { id: "2000s", label: "2000s" },
+  { id: "90s", label: "'90s" },
+  { id: "80s", label: "'80s" },
+  { id: "70s", label: "'70s" },
+  { id: "60s", label: "'60s" },
+];
+
 const DURATIONS = [
   { id: "30", label: "30 min", desc: "~8-10 tracks" },
   { id: "60", label: "60 min", desc: "~16-18 tracks" },
@@ -51,8 +62,12 @@ export default function Home() {
   const [genre, setGenre] = useState<string | null>(null);
   const [mood, setMood] = useState<string | null>(null);
   const [duration, setDuration] = useState<string>("60");
+  const [era, setEra] = useState<string>("any");
 
   const canGenerate = genre && mood && !loading;
+  const selectedGenre = GENRES.find(g => g.id === genre);
+  const selectedMood = MOODS.find(m => m.id === mood);
+  const selectedEra = ERAS.find(e => e.id === era);
 
   const handleGenerate = async () => {
     if (!canGenerate) return;
@@ -64,7 +79,7 @@ export default function Home() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ genre, mood, duration }),
+        body: JSON.stringify({ genre, mood, duration, era }),
       });
 
       const data = await res.json();
@@ -97,13 +112,81 @@ export default function Home() {
       <div className="shape-ring"></div>
 
       <main className="container">
-        {/* Left Panel - Options */}
-        <div className="glass-panel options-panel">
+        {/* Left Panel - Player Style */}
+        <div className="glass-panel player-panel">
           <div className="panel-header">
-            <span className="header-title">Create Your Mix</span>
+            <span className="header-title">Generate mix</span>
           </div>
 
-          {/* Genre Selection */}
+          <div className="album-art-container">
+            <div className="album-art">
+              {selectedGenre && (
+                <div className="album-overlay">
+                  <span className="album-genre-icon">{selectedGenre.icon}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="track-info">
+            <h2 className="track-title">
+              {selectedGenre ? selectedGenre.label : "Select a Genre"}
+            </h2>
+            <p className="track-artist">
+              {selectedMood
+                ? `${selectedMood.icon} ${selectedMood.label} · ${selectedEra?.label} · ${DURATIONS.find(d => d.id === duration)?.label}`
+                : "Choose your mood to begin"}
+            </p>
+          </div>
+
+          {/* Duration toggle styled like a progress bar area */}
+          <div className="duration-bar">
+            {DURATIONS.map((d) => (
+              <button
+                key={d.id}
+                className={`duration-pill ${duration === d.id ? 'duration-pill-active' : ''}`}
+                onClick={() => setDuration(d.id)}
+                disabled={loading}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Play / Generate button */}
+          <div className="controls">
+            <button
+              className={`play-btn ${loading ? 'loading' : ''}`}
+              onClick={handleGenerate}
+              disabled={!canGenerate}
+              title={!genre || !mood ? "Select a genre and mood first" : "Generate Playlist"}
+            >
+              {loading ? (
+                <div className="spinner"></div>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              )}
+            </button>
+          </div>
+
+          <p className="generate-hint">
+            {loading ? 'Generating your mix...' : !genre || !mood ? 'Select genre & mood' : 'Tap to generate'}
+          </p>
+
+          {error && (
+            <div className="error-msg">
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Right Panel - Selections & Result */}
+        <div className="glass-panel list-panel">
+          <div className="panel-header">
+            <span className="header-title">Settings</span>
+          </div>
+
+          {/* Genre */}
           <div className="section">
             <h3 className="section-title">Genre</h3>
             <div className="chip-grid">
@@ -121,7 +204,24 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Mood Selection */}
+          {/* Era */}
+          <div className="section">
+            <h3 className="section-title">Era</h3>
+            <div className="chip-grid">
+              {ERAS.map((e) => (
+                <button
+                  key={e.id}
+                  className={`chip ${era === e.id ? 'chip-active' : ''}`}
+                  onClick={() => setEra(e.id)}
+                  disabled={loading}
+                >
+                  <span>{e.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mood */}
           <div className="section">
             <h3 className="section-title">Mood</h3>
             <div className="chip-grid">
@@ -139,97 +239,14 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Duration */}
-          <div className="section">
-            <h3 className="section-title">Duration</h3>
-            <div className="duration-toggle">
-              {DURATIONS.map((d) => (
-                <button
-                  key={d.id}
-                  className={`duration-btn ${duration === d.id ? 'duration-active' : ''}`}
-                  onClick={() => setDuration(d.id)}
-                  disabled={loading}
-                >
-                  <span className="duration-label">{d.label}</span>
-                  <span className="duration-desc">{d.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Panel - Generate & Result */}
-        <div className="glass-panel result-panel">
-          <div className="panel-header">
-            <span className="header-title">Result</span>
-          </div>
-
-          {/* Summary of selections */}
-          <div className="selection-summary">
-            <div className="summary-item">
-              <span className="summary-label">Genre</span>
-              <span className="summary-value">{genre ? GENRES.find(g => g.id === genre)?.label : '—'}</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Mood</span>
-              <span className="summary-value">{mood ? MOODS.find(m => m.id === mood)?.label : '—'}</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Duration</span>
-              <span className="summary-value">{DURATIONS.find(d => d.id === duration)?.label}</span>
-            </div>
-          </div>
-
-          {/* Generate button */}
-          <div className="generate-area">
-            <button 
-              className={`generate-btn ${loading ? 'loading' : ''}`}
-              onClick={handleGenerate}
-              disabled={!canGenerate}
-              title={!genre || !mood ? "Select a genre and mood first" : "Generate Playlist"}
-            >
-              {loading ? (
-                <div className="spinner"></div>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              )}
-            </button>
-            <p className="generate-hint">
-              {loading ? 'Generating your mix...' : !genre || !mood ? 'Select genre & mood to start' : 'Tap to generate'}
-            </p>
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div className="error-msg">
-              {error}
-            </div>
-          )}
-
           {/* Result */}
-          {playlist ? (
-            <>
+          {playlist && (
+            <div className="section">
+              <h3 className="section-title">Your Playlist</h3>
               <PlaylistCard url={playlist.url} name={playlist.name} trackCount={playlist.count} />
               <button className="reset-btn" onClick={handleReset}>
                 Generate Another
               </button>
-            </>
-          ) : !loading && (
-            <div className="placeholder-list">
-              <div className="list-item" style={{ opacity: 0.4 }}>
-                <div className="list-item-img" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
-                <div className="list-item-info">
-                  <div style={{ width: '60%', height: '14px', background: 'rgba(255,255,255,0.15)', borderRadius: '4px' }}></div>
-                  <div style={{ width: '40%', height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginTop: '8px' }}></div>
-                </div>
-              </div>
-              <div className="list-item" style={{ opacity: 0.2 }}>
-                <div className="list-item-img" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
-                <div className="list-item-info">
-                  <div style={{ width: '70%', height: '14px', background: 'rgba(255,255,255,0.15)', borderRadius: '4px' }}></div>
-                  <div style={{ width: '50%', height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', marginTop: '8px' }}></div>
-                </div>
-              </div>
             </div>
           )}
         </div>
