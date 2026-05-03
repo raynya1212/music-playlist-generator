@@ -63,46 +63,71 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to generate playlist. Please try again." }, { status: 500 });
     }
 
-    // 2. Initialize YouTube API with Simple API Key
-    const youtube = google.youtube({ 
-      version: "v3", 
-      auth: process.env.YOUTUBE_API_KEY 
-    });
+    // 2. Try YouTube Data API first, fall back to search URLs if quota exhausted
+    let videoIds: string[] = [];
+    let apiAvailable = true;
 
-    // 3. Search for video IDs
-    const videoIds: string[] = [];
-    for (const track of playlistData.tracks) {
-      const searchQuery = `${track.title} ${track.artist} official audio`;
-      try {
-        const searchRes = await youtube.search.list({
-          part: ["id"],
-          q: searchQuery,
-          type: ["video"],
-          maxResults: 1,
-        });
+    if (process.env.YOUTUBE_API_KEY) {
+      const youtube = google.youtube({ 
+        version: "v3", 
+        auth: process.env.YOUTUBE_API_KEY 
+      });
 
-        if (searchRes.data.items && searchRes.data.items.length > 0) {
-          videoIds.push(searchRes.data.items[0].id?.videoId as string);
+      for (const track of playlistData.tracks) {
+        if (!apiAvailable) break;
+        const searchQuery = `${track.title} ${track.artist} official audio`;
+        try {
+          const searchRes = await youtube.search.list({
+            part: ["id"],
+            q: searchQuery,
+            type: ["video"],
+            maxResults: 1,
+          });
+
+          if (searchRes.data.items && searchRes.data.items.length > 0) {
+            videoIds.push(searchRes.data.items[0].id?.videoId as string);
+          }
+        } catch (err: any) {
+          console.error(`YouTube API error for ${searchQuery}:`, err?.message || err);
+          // If quota exceeded or forbidden, stop trying the API
+          if (err?.code === 403 || err?.status === 403 || err?.message?.includes("quota")) {
+            console.warn("YouTube API quota likely exceeded, switching to fallback.");
+            apiAvailable = false;
+          }
         }
-      } catch (err) {
-        console.error(`Error searching for ${searchQuery}:`, err);
       }
+    } else {
+      apiAvailable = false;
     }
 
-    if (videoIds.length === 0) {
-      return NextResponse.json({ error: "Could not find any of the generated songs on YouTube." }, { status: 500 });
+    // 3. Build playlist URL
+    let playlistUrl: string;
+
+    if (videoIds.length > 0) {
+      // Use watch_videos URL with found video IDs
+      const safeVideoIds = videoIds.slice(0, 50);
+      playlistUrl = `https://www.youtube.com/watch_videos?video_ids=${safeVideoIds.join(",")}`;
+    } else {
+      // Fallback: build a YouTube search URL for the first track as entry point
+      // and return full track list so the user can find them
+      const firstTrack = playlistData.tracks[0];
+      const query = encodeURIComponent(`${firstTrack.title} ${firstTrack.artist}`);
+      playlistUrl = `https://www.youtube.com/results?search_query=${query}`;
     }
 
-    // 4. Construct Anonymous YouTube Playlist URL
-    // maximum 50 videos supported by this URL trick
-    const safeVideoIds = videoIds.slice(0, 50);
-    const playlistUrl = `https://www.youtube.com/watch_videos?video_ids=${safeVideoIds.join(",")}`;
+    // Build track list for display
+    const trackList = playlistData.tracks.map((t: { title: string; artist: string }) => ({
+      title: t.title,
+      artist: t.artist,
+    }));
 
     return NextResponse.json({ 
       success: true, 
       playlistUrl: playlistUrl,
       name: playlistData.playlistName,
-      trackCount: safeVideoIds.length
+      trackCount: playlistData.tracks.length,
+      tracks: trackList,
+      usedFallback: videoIds.length === 0,
     });
 
   } catch (error: any) {

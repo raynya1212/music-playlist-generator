@@ -56,7 +56,13 @@ const DURATIONS = [
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [playlist, setPlaylist] = useState<{url: string, name: string, count: number} | null>(null);
+  const [playlist, setPlaylist] = useState<{
+    url: string;
+    name: string;
+    count: number;
+    tracks: { title: string; artist: string }[];
+    usedFallback: boolean;
+  } | null>(null);
   const [genre, setGenre] = useState<string | null>(null);
   const [mood, setMood] = useState<string | null>(null);
   const [duration, setDuration] = useState<string>("60");
@@ -89,7 +95,9 @@ export default function Home() {
       setPlaylist({
         url: data.playlistUrl,
         name: data.name,
-        count: data.trackCount
+        count: data.trackCount,
+        tracks: data.tracks || [],
+        usedFallback: data.usedFallback || false,
       });
     } catch (err: any) {
       setError(err.message);
@@ -251,7 +259,7 @@ export default function Home() {
                 <span className="section-number">✓</span>
                 <h3 className="section-title">Your Playlist</h3>
               </div>
-              <PlaylistCard url={playlist.url} name={playlist.name} trackCount={playlist.count} />
+              <PlaylistCard url={playlist.url} name={playlist.name} trackCount={playlist.count} tracks={playlist.tracks} usedFallback={playlist.usedFallback} />
               <button className="reset-btn" onClick={handleReset}>
                 Generate Another
               </button>
