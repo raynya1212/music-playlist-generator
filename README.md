@@ -4,7 +4,7 @@ A music player-inspired web app that generates curated YouTube playlists using A
 
 ## Features
 
-- 🎤 **16 Genres** — Pop, Rock, Hip Hop, R&B, Electronic, Jazz, Classical, Indie, Country, Alternative, Chill/Lo-fi, Blues, Metal, K-Pop, Latin, Folk
+- 🎤 **16 Genres** — Pop, Rock, Hip Hop, R&B, Electronic, Jazz, EDM, Indie, Country, Alternative, Chill/Lo-fi, Blues, Metal, K-Pop, Latin, Folk
 - 📅 **Era Selection** — Any Era, 2020s, 2010s, 2000s, '90s, '80s, '70s, '60s
 - 😌 **12 Moods** — Energetic, Chill, Happy, Melancholy, Romantic, Focus, Party, Workout, Dreamy, Dark, Uplifting, Nostalgic
 - ⏱️ **Duration** — 30 min (~8-10 tracks) or 60 min (~16-18 tracks)

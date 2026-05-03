@@ -10,7 +10,7 @@ const GENRES = [
   { id: "r-and-b", label: "R&B / Soul", icon: "🎷" },
   { id: "electronic", label: "Electronic", icon: "🎹" },
   { id: "jazz", label: "Jazz", icon: "🎺" },
-  { id: "classical", label: "Classical", icon: "🎻" },
+  { id: "edm", label: "EDM", icon: "🎛️" },
   { id: "indie", label: "Indie", icon: "🌿" },
   { id: "country", label: "Country", icon: "🤠" },
   { id: "alternative", label: "Alternative", icon: "⚡" },
